@@ -1,0 +1,677 @@
+[
+    {
+        "id": "15879db5513e7802",
+        "type": "tab",
+        "label": "Bot do Murilo",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "08d8f1eafc4a95b8",
+        "type": "http request",
+        "z": "15879db5513e7802",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 680,
+        "y": 380,
+        "wires": [
+            [
+                "cda0eed9cca19238"
+            ]
+        ]
+    },
+    {
+        "id": "b802a6772896a012",
+        "type": "debug",
+        "z": "15879db5513e7802",
+        "name": "Saída geral",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1230,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "cda0eed9cca19238",
+        "type": "json",
+        "z": "15879db5513e7802",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 850,
+        "y": 380,
+        "wires": [
+            [
+                "bd4db05a7fb9f07a",
+                "182baa219e3449e1",
+                "72f88342e3bd1925",
+                "f7b0a72ae823313e"
+            ]
+        ]
+    },
+    {
+        "id": "949625e60f24c226",
+        "type": "comment",
+        "z": "15879db5513e7802",
+        "name": "Injeção de Dados",
+        "info": "",
+        "x": 140,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "c7f11a2446c77a18",
+        "type": "comment",
+        "z": "15879db5513e7802",
+        "name": "Requisição Site",
+        "info": "",
+        "x": 540,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "c657bf12a07bc87b",
+        "type": "comment",
+        "z": "15879db5513e7802",
+        "name": "Converte String para JSON",
+        "info": "",
+        "x": 750,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "624e4547021a9b15",
+        "type": "comment",
+        "z": "15879db5513e7802",
+        "name": "Printa os dados solicitados do JSON",
+        "info": "",
+        "x": 1260,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "83329ec693cc1f84",
+        "type": "function",
+        "z": "15879db5513e7802",
+        "name": "Solicita cidade",
+        "func": "//https://api.openweathermap.org/data/2.5/weather?q={cidade}&appid=7e271a73273b5f417b5fa284c8f25826&units=metric\n\nlet chatId = msg.payload.chatId;\nflow.set(\"chatId\", chatId);\n\nlet cidade = msg.payload.content;\n\n\nlet url_par1 = \"https://api.openweathermap.org/data/2.5/weather?q=\";\nlet url_par2 = \"&appid=7e271a73273b5f417b5fa284c8f25826&units=metric&lang=pt_br\";\n\nlet urlreq = url_par1 + cidade +  url_par2;\n\nmsg.url = urlreq;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 380,
+        "wires": [
+            [
+                "08d8f1eafc4a95b8"
+            ]
+        ]
+    },
+    {
+        "id": "bd4db05a7fb9f07a",
+        "type": "function",
+        "z": "15879db5513e7802",
+        "name": "Filtro",
+        "func": "let cidade = msg.payload.content;\nvar erro = msg.payload.message\nlet texto;\n\nlet temperatura = msg.payload.main.temp\nlet nome = msg.payload.name\nlet umidade = msg.payload.main.humidity\nlet clima = msg.payload.weather[0].description\nlet vento = msg.payload.wind.speed\n\n\nflow.set('temperatura',temperatura)\nflow.set('nome', nome)\nflow.set('umidade', umidade)\nflow.set('clima', clima)\nflow.set('vento', vento)\n\nif (texto = erro) {\n   texto = \"Cidade Inválida, tente novamente!!\"\n\n} else {\n   texto = \"Hoje, na cidade: \" + nome + \" está fazendo \" + \"temperatura: \" + temperatura + \"°C \" + \" e a Umidade é de: \" + umidade + \"%\" + \" e o clima é: \" + clima + \", já o vento está com uma velocidade: \" + vento + \"km/h\"\n}\n\n\nmsg.payload = {}\nmsg.payload.chatId = flow.get(\"chatId\");\n// msg.payload.chatId = 5803486037;\nmsg.payload.type = 'message';\nmsg.payload.content = texto;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 300,
+        "wires": [
+            [
+                "b802a6772896a012",
+                "6090b9f96734ac46"
+            ]
+        ]
+    },
+    {
+        "id": "6090b9f96734ac46",
+        "type": "telegram sender",
+        "z": "15879db5513e7802",
+        "name": "",
+        "bot": "6c4976d84800c886",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1230,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2bd4645b792a2a1d",
+        "type": "ui_gauge",
+        "z": "15879db5513e7802",
+        "name": "",
+        "group": "7453b0b9529cded0",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "donut",
+        "title": "",
+        "label": "°C",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 1290,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "9cc0832ae2584ccd",
+        "type": "function",
+        "z": "15879db5513e7802",
+        "name": "function 5",
+        "func": "let cidade = msg.payload;\nlet url_par1 = \"https://api.openweathermap.org/data/2.5/weather?q=\";\nlet url_par2 = \"&appid=7e271a73273b5f417b5fa284c8f25826&units=metric&lang=pt_br\";\n\nlet urlreq = url_par1 + cidade +  url_par2;\n\nmsg.url = urlreq;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 460,
+        "wires": [
+            [
+                "08d8f1eafc4a95b8",
+                "f14a8bded1d9b8ea"
+            ]
+        ]
+    },
+    {
+        "id": "182baa219e3449e1",
+        "type": "function",
+        "z": "15879db5513e7802",
+        "name": "Gauge temperatura",
+        "func": "let resposta = msg.payload.main.temp\nmsg.payload = resposta;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1070,
+        "y": 420,
+        "wires": [
+            [
+                "2bd4645b792a2a1d",
+                "409a99215b4038b2"
+            ]
+        ]
+    },
+    {
+        "id": "f7b0a72ae823313e",
+        "type": "function",
+        "z": "15879db5513e7802",
+        "name": "Gauge umidade",
+        "func": "let resposta = msg.payload.main.humidity\nmsg.payload = resposta;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 540,
+        "wires": [
+            [
+                "e83ead47777d0772",
+                "59b03b6078cc78e5"
+            ]
+        ]
+    },
+    {
+        "id": "1c269ef1b0720191",
+        "type": "ui_text_input",
+        "z": "15879db5513e7802",
+        "name": "",
+        "label": "",
+        "tooltip": "",
+        "group": "1374216df7b24bd4",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "mode": "text",
+        "delay": "",
+        "topic": "topic",
+        "sendOnBlur": false,
+        "className": "",
+        "topicType": "msg",
+        "x": 200,
+        "y": 580,
+        "wires": [
+            [
+                "6a48e4ee7a227a0f"
+            ]
+        ]
+    },
+    {
+        "id": "53cb2d5748572183",
+        "type": "function",
+        "z": "15879db5513e7802",
+        "name": "audio",
+        "func": "let cidade = msg.payload\n\nlet temperatura = flow.get('temperatura')\nlet nome = flow.get('nome')\nlet umidade = flow.get('umidade')\nlet clima = flow.get('clima')\nlet vento = flow.get('vento')\n\nlet resposta= \"Hoje, na cidade: \" + nome + \" está fazendo \" + \"temperatura: \" + temperatura + \"graus\" + \" e a Umidade é de: \" + umidade + \"%\" + \" e o clima é: \" + clima + \", já o vento está com uma velocidade: \" + vento + \"quilometros\"\n\nmsg.payload = resposta;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1210,
+        "y": 660,
+        "wires": [
+            [
+                "b55402f880dc355f",
+                "9074ab196a15e69d"
+            ]
+        ]
+    },
+    {
+        "id": "c20dd270e0118b61",
+        "type": "function",
+        "z": "15879db5513e7802",
+        "name": "function 9",
+        "func": "let swi = msg.payload\nlet resposta\n\nif (swi = true){\n     resposta = \"Hoje, na cidade de \" + msg.payload.name + \" está fazendo \" + msg.payload.main.temp + \"°C \" + \" e a Umidade é de \" + msg.payload.main.humidity + \"%\" + \" e o clima é \" + msg.payload.weather[0].description + \", já o vento está com uma velocidade de \" + msg.payload.wind.speed + \"km/h\"\n\n}\nmsg.payload = resposta;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1240,
+        "y": 840,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b55402f880dc355f",
+        "type": "ui_audio",
+        "z": "15879db5513e7802",
+        "name": "",
+        "group": "573ee9bf04bb2f9c",
+        "voice": "Microsoft Daniel - Portuguese (Brazil)",
+        "always": "",
+        "x": 1380,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "72f88342e3bd1925",
+        "type": "ui_button",
+        "z": "15879db5513e7802",
+        "name": "",
+        "group": "573ee9bf04bb2f9c",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Botão",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 1050,
+        "y": 660,
+        "wires": [
+            [
+                "53cb2d5748572183"
+            ]
+        ]
+    },
+    {
+        "id": "f73dd071281d27da",
+        "type": "debug",
+        "z": "15879db5513e7802",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 560,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "81484a76a79fcdb5",
+        "type": "ui_button",
+        "z": "15879db5513e7802",
+        "name": "",
+        "group": "1374216df7b24bd4",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Enviar",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "cidade",
+        "payloadType": "flow",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 250,
+        "y": 500,
+        "wires": [
+            [
+                "9cc0832ae2584ccd"
+            ]
+        ]
+    },
+    {
+        "id": "6a48e4ee7a227a0f",
+        "type": "function",
+        "z": "15879db5513e7802",
+        "name": "function 10",
+        "func": "flow.set(\"cidade\", msg.payload)\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 580,
+        "wires": [
+            [
+                "f73dd071281d27da"
+            ]
+        ]
+    },
+    {
+        "id": "e83ead47777d0772",
+        "type": "ui_gauge",
+        "z": "15879db5513e7802",
+        "name": "",
+        "group": "fda1661e40ecdfee",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "wave",
+        "title": "",
+        "label": "%",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 1290,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "f14a8bded1d9b8ea",
+        "type": "debug",
+        "z": "15879db5513e7802",
+        "name": "debug 7",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 620,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "ddad8ac0bf46cc54",
+        "type": "telegram receiver",
+        "z": "15879db5513e7802",
+        "name": "",
+        "bot": "6c4976d84800c886",
+        "saveDataDir": "",
+        "filterCommands": false,
+        "x": 90,
+        "y": 440,
+        "wires": [
+            [
+                "83329ec693cc1f84"
+            ],
+            [
+                "83329ec693cc1f84",
+                "81484a76a79fcdb5"
+            ]
+        ]
+    },
+    {
+        "id": "409a99215b4038b2",
+        "type": "ui_chart",
+        "z": "15879db5513e7802",
+        "name": "",
+        "group": "7453b0b9529cded0",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1290,
+        "y": 480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9074ab196a15e69d",
+        "type": "ui_text",
+        "z": "15879db5513e7802",
+        "group": "573ee9bf04bb2f9c",
+        "order": 2,
+        "width": "7",
+        "height": "5",
+        "name": "",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1370,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "59b03b6078cc78e5",
+        "type": "ui_chart",
+        "z": "15879db5513e7802",
+        "name": "",
+        "group": "fda1661e40ecdfee",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "label": "",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1290,
+        "y": 600,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6c4976d84800c886",
+        "type": "telegram bot",
+        "botname": "BOT_IOT",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "testenvironment": false,
+        "updatemode": "polling",
+        "pollinterval": "300",
+        "usesocks": false,
+        "sockshost": "",
+        "socksprotocol": "socks5",
+        "socksport": "6667",
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbotport": "8443",
+        "publicbotport": "8443",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    },
+    {
+        "id": "7453b0b9529cded0",
+        "type": "ui_group",
+        "name": "Temperatura",
+        "tab": "db711a3d6b9def8c",
+        "order": 1,
+        "disp": true,
+        "width": "8",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "1374216df7b24bd4",
+        "type": "ui_group",
+        "name": "Digite o nome de uma cidade:",
+        "tab": "db711a3d6b9def8c",
+        "order": 3,
+        "disp": true,
+        "width": 7,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "573ee9bf04bb2f9c",
+        "type": "ui_group",
+        "name": "Solicitação áudio e texto",
+        "tab": "db711a3d6b9def8c",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "fda1661e40ecdfee",
+        "type": "ui_group",
+        "name": "Umidade",
+        "tab": "db711a3d6b9def8c",
+        "order": 2,
+        "disp": true,
+        "width": 9,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "db711a3d6b9def8c",
+        "type": "ui_tab",
+        "name": "telegram DS",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
